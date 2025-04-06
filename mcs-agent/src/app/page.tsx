@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import ReputationSection from '@/components/ReputationSection';
 
 export default function Home() {
   return (
@@ -21,6 +22,12 @@ export default function Home() {
             Mint NFT
           </Button>
         </div>
+
+        {repoPath && (
+          <section className="mb-8">
+            <ReputationSection repoUrl={repoUrl} />
+          </section>
+        )}
       </div>
     </div>
   );
