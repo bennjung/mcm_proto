@@ -1,0 +1,175 @@
+name: MCS Security Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # 수동 트리거 옵션
+  workflow_dispatch:
+    inputs:
+      wallet_address:
+        description: '지갑 주소 (NFT 수신)'
+        required: true
+      chain_type:
+        description: '블록체인 네트워크 선택'
+        required: true
+        default: '0g-testnet'
+        type: choice
+        options:
+          - '0g-testnet'
+          - '0g-mainnet'
+          - 'sepolia'
+
+env:
+  NODE_VERSION: 16
+  PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+  PINATA_SECRET_KEY: ${{ secrets.PINATA_SECRET_KEY }}
+  ZERO_G_PRIVATE_KEY: ${{ secrets.ZERO_G_PRIVATE_KEY }}
+  ZERO_G_RPC_URL: ${{ secrets.ZERO_G_RPC_URL }}
+  NFT_CONTRACT_ADDRESS: ${{ secrets.NFT_CONTRACT_ADDRESS }}
+  WALLET_ADDRESS: ${{ github.event.inputs.wallet_address || secrets.DEFAULT_WALLET_ADDRESS }}
+  TEE_API_KEY: ${{ secrets.TEE_API_KEY }}
+  TEE_SERVICE_URL: ${{ secrets.TEE_SERVICE_URL }}
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Python 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: 의존성 설치 (Node.js)
+        run: |
+          npm ci
+          npm install -g @thirdweb-dev/cli ethers@5.7.2
+
+      - name: 의존성 설치 (Python)
+        run: |
+          cd python-analyzer
+          pip install -r requirements.txt
+
+      - name: Python 분석 서버 시작
+        run: |
+          cd python-analyzer
+          nohup python app.py &
+          sleep 5  # 서버가 시작될 때까지 대기
+
+      - name: 보안 분석 실행
+        id: analyze
+        run: |
+          REPO_PATH=$(pwd)
+          OUTPUT=$(node scripts/analyze-repo.js --path "$REPO_PATH" --extensions ".sol,.js,.ts")
+          echo "::set-output name=analysis_result::$OUTPUT"
+          echo "Analysis completed"
+
+      - name: TEE 증명 생성
+        id: tee
+        run: |
+          OUTPUT=$(node scripts/generate-tee-attestation.js --analysis "${{ steps.analyze.outputs.analysis_result }}")
+          echo "::set-output name=attestation::$OUTPUT"
+          echo "TEE attestation generated"
+
+      - name: 코드 암호화
+        id: encrypt
+        run: |
+          OUTPUT=$(node scripts/encrypt-code.js --path "$REPO_PATH" --analysis "${{ steps.analyze.outputs.analysis_result }}")
+          echo "::set-output name=encryption_result::$OUTPUT"
+          echo "Encryption completed"
+
+      - name: IPFS 업로드
+        id: ipfs
+        run: |
+          OUTPUT=$(node scripts/upload-to-ipfs.js \
+            --encrypted "${{ steps.encrypt.outputs.encryption_result }}" \
+            --analysis "${{ steps.analyze.outputs.analysis_result }}" \
+            --attestation "${{ steps.tee.outputs.attestation }}")
+          echo "::set-output name=ipfs_result::$OUTPUT"
+          echo "IPFS upload completed"
+
+      - name: 0G Chain NFT 민팅
+        id: mint
+        if: ${{ contains(github.event.inputs.chain_type, '0g') }}
+        run: |
+          OUTPUT=$(node scripts/mint-on-0g-chain.js \
+            --address "${{ env.WALLET_ADDRESS }}" \
+            --metadata "${{ steps.ipfs.outputs.ipfs_result }}" \
+            --attestation "${{ steps.tee.outputs.attestation }}" \
+            --network "${{ github.event.inputs.chain_type }}")
+          echo "::set-output name=mint_result::$OUTPUT"
+          echo "0G Chain NFT minting completed"
+
+      - name: ThirdWeb NFT 민팅 (대체 옵션)
+        id: thirdweb-mint
+        if: ${{ !contains(github.event.inputs.chain_type, '0g') }}
+        run: |
+          OUTPUT=$(node scripts/mint-thirdweb.js \
+            --address "${{ env.WALLET_ADDRESS }}" \
+            --metadata "${{ steps.ipfs.outputs.ipfs_result }}" \
+            --network "${{ github.event.inputs.chain_type }}")
+          echo "::set-output name=mint_result::$OUTPUT"
+          echo "ThirdWeb NFT minting completed"
+
+      - name: 결과 요약 생성
+        run: |
+          cat << EOF > mcs-report.md
+          # MCS 보안 분석 보고서
+
+          ## 분석 결과 요약
+          
+          - 분석 일시: $(date +'%Y-%m-%d %H:%M:%S')
+          - 저장소: ${{ github.repository }}
+          - 커밋: ${{ github.sha }}
+          
+          ### 취약점 요약
+          
+          ${{ steps.analyze.outputs.analysis_result }}
+          
+          ### NFT 발행 정보
+          
+          - 토큰 ID: ${{ steps.mint.outputs.mint_result || steps.thirdweb-mint.outputs.mint_result }}
+          - 네트워크: ${{ github.event.inputs.chain_type }}
+          - 수신 지갑: ${{ env.WALLET_ADDRESS }}
+          - IPFS URI: ${{ steps.ipfs.outputs.ipfs_result }}
+          
+          ### TEE 증명 정보
+          
+          ${{ steps.tee.outputs.attestation }}
+          
+          EOF
+
+      - name: 보고서 업로드
+        uses: actions/upload-artifact@v3
+        with:
+          name: mcs-security-report
+          path: mcs-report.md
+
+      - name: 결과 알림 (GitHub Issues)
+        if: ${{ always() }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const reportContent = fs.readFileSync('mcs-report.md', 'utf8');
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `MCS 보안 분석 결과: ${new Date().toISOString().split('T')[0]}`,
+              body: reportContent,
+              labels: ['security', 'mcs-report']
+            }); 
