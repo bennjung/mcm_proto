@@ -16,7 +16,7 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "prepare": "husky install",
-    "vercel-build": "next build"
+    "vercel-build": "npm install && next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -34,8 +34,8 @@
     "multiformats": "^12.0.0",
     "next": "^14.1.0",
     "postcss": "^8.4.35",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-hook-form": "^7.50.1",
     "tailwind-merge": "^2.2.1",
     "tailwindcss": "^3.4.1",
