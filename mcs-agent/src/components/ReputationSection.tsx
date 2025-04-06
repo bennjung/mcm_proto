@@ -1,6 +1,38 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+interface RepositoryMetrics {
+  stars: number;
+  forks: number;
+  watchers: number;
+  open_issues: number;
+  contributors: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TrustScore {
+  score: number;
+  grade: string;
+  details: {
+    baseScore: number;
+    starScore: number;
+    forkScore: number;
+    contributorScore: number;
+    issuePenalty: number;
+  };
+}
+
+interface ReputationResult {
+  repository: {
+    name: string;
+    full_name: string;
+    description: string;
+  };
+  metrics: RepositoryMetrics;
+  trust_score: TrustScore;
+}
+
 interface ReputationSectionProps {
   repoUrl: string;
 }
@@ -8,7 +40,7 @@ interface ReputationSectionProps {
 export default function ReputationSection({ repoUrl }: ReputationSectionProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ReputationResult | null>(null);
 
   const analyzeRepoMetrics = async () => {
     if (!repoUrl) {
@@ -22,8 +54,12 @@ export default function ReputationSection({ repoUrl }: ReputationSectionProps) {
     try {
       const response = await axios.post('/api/reputation/analyze', { repoUrl });
       setResult(response.data);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to analyze repository metrics');
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error || 'Failed to analyze repository metrics');
+      } else {
+        setError('Failed to analyze repository metrics');
+      }
       console.error(err);
     } finally {
       setLoading(false);

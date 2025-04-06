@@ -1,7 +1,11 @@
 import { Button } from '@/components/ui/button';
 import ReputationSection from '@/components/ReputationSection';
+import { useState } from 'react';
 
 export default function Home() {
+  const [repoPath, setRepoPath] = useState<string>('');
+  const [repoUrl, setRepoUrl] = useState<string>('');
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
@@ -16,7 +20,7 @@ export default function Home() {
             Encrypt Code
           </Button>
           <Button variant="outline" className="w-full">
-            Upload to IPFS
+            Upload to 0G Storage
           </Button>
           <Button variant="outline" className="w-full">
             Mint NFT
