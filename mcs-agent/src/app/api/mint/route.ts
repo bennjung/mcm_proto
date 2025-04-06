@@ -1,62 +1,57 @@
 import { NextResponse } from 'next/server';
-import { ThirdwebSDK } from '@thirdweb-dev/sdk';
-import { ethers } from 'ethers';
-import { uploadJsonToZeroGStorage } from '@/services/zeroGStorage';
+import { NFTService } from '@/services/nftService';
+import { NFTMetadata } from '@/types/nftContract';
 
-interface TransferEvent {
-  event: string;
-  args: {
-    tokenId: {
-      toString: () => string;
-    };
-  };
-}
-
+/**
+ * NFT 민팅 API
+ * 
+ * TODO: 실제 구현 필요
+ * - 컨트랙트 배포 및 주소 설정
+ * - 지갑 프라이빗 키 보안 관리
+ * - 트랜잭션 가스비 최적화
+ * - 에러 처리 및 재시도 로직
+ */
 export async function POST(request: Request) {
   try {
     const { metadata } = await request.json();
     
-    // 0G Storage에 메타데이터 업로드
-    const storageResult = await uploadJsonToZeroGStorage(metadata, {
-      name: metadata.name,
-      description: metadata.description
-    });
-    
-    if (!storageResult.success) {
-      throw new Error(`Failed to upload to 0G Storage: ${storageResult.error}`);
+    // TODO: 메타데이터 검증 로직 추가
+    if (!metadata.name || !metadata.description) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required metadata' },
+        { status: 400 }
+      );
     }
     
-    // Thirdweb SDK 초기화
-    const sdk = new ThirdwebSDK(
-      new ethers.Wallet(
-        process.env.PRIVATE_KEY!,
-        ethers.getDefaultProvider(process.env.NETWORK_RPC_URL)
-      )
-    );
+    // TODO: 수신자 주소 검증
+    if (!process.env.WALLET_ADDRESS) {
+      return NextResponse.json(
+        { success: false, error: 'Missing wallet address' },
+        { status: 500 }
+      );
+    }
     
-    // NFT 컨트랙트 가져오기
-    const contract = await sdk.getContract(process.env.NFT_CONTRACT_ADDRESS!);
+    // NFT 서비스 초기화
+    const nftService = new NFTService();
+    
+    // 잔액 확인
+    const balance = await nftService.getBalance();
+    console.log('Wallet balance:', balance, 'ETH');
     
     // NFT 민팅
-    const tx = await contract.erc721.mintTo(process.env.WALLET_ADDRESS!, {
-      name: metadata.name,
-      description: metadata.description,
-      image: storageResult.uri,
-      properties: metadata.properties || {}
-    });
+    const result = await nftService.mintNFT(
+      metadata as NFTMetadata,
+      process.env.WALLET_ADDRESS
+    );
     
-    // 트랜잭션 영수증 가져오기
-    const receipt = await tx.receipt;
-    
-    // 토큰 ID 추출
-    const tokenId = receipt.events?.find(
-      (e: TransferEvent) => e.event === 'Transfer'
-    )?.args?.tokenId?.toString();
+    if (!result.success) {
+      throw new Error(result.error);
+    }
     
     return NextResponse.json({ 
-      success: true, 
-      tokenId,
-      storageUri: storageResult.uri
+      success: true,
+      tokenId: result.tokenId,
+      transactionHash: result.transactionHash
     });
   } catch (error) {
     console.error('Minting error:', error);

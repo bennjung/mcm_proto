@@ -10,14 +10,12 @@ const nextConfig: NextConfig = {
   },
   // MCS Agent 관련 설정
   env: {
-    GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-    ANALYZER_API_URL: process.env.ANALYZER_API_URL,
-    TEE_SERVICE_URL: process.env.TEE_SERVICE_URL,
-    TEE_API_KEY: process.env.TEE_API_KEY,
-    PINATA_API_KEY: process.env.PINATA_API_KEY,
-    PINATA_SECRET_KEY: process.env.PINATA_SECRET_KEY,
-    ZEROG_CHAIN_RPC_URL: process.env.ZEROG_CHAIN_RPC_URL,
-    ZEROG_CHAIN_PRIVATE_KEY: process.env.ZEROG_CHAIN_PRIVATE_KEY,
+    NETWORK_RPC_URL: process.env.NETWORK_RPC_URL,
+    PRIVATE_KEY: process.env.PRIVATE_KEY,
+    NFT_CONTRACT_ADDRESS: process.env.NFT_CONTRACT_ADDRESS,
+    WALLET_ADDRESS: process.env.WALLET_ADDRESS,
+    ZERO_G_STORAGE_API: process.env.ZERO_G_STORAGE_API,
+    ZERO_G_STORAGE_KEY: process.env.ZERO_G_STORAGE_KEY
   },
   // API 라우트 설정
   async rewrites() {

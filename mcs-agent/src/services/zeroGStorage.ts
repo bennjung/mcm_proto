@@ -4,12 +4,25 @@ import path from 'path';
 import { createHash } from 'crypto';
 import { ZeroGStorageOptions, ZeroGStorageResponse, AnalysisResult } from '../types/zeroGStorage';
 
-// 0G Storage API 설정
+// TODO: 0G Storage API 엔드포인트 및 인증 정보 설정
+// 1. 0G Storage 개발자 포털 접속 (https://developer.0g.dev)
+// 2. 프로젝트 생성 후 API 키 발급
+// 3. API 문서에서 엔드포인트 확인
+// 4. 발급받은 API 키를 .env 파일에 설정
 const ZERO_G_STORAGE_API = process.env.ZERO_G_STORAGE_API || 'https://storage.0g.dev/v1';
 const ZERO_G_STORAGE_KEY = process.env.ZERO_G_STORAGE_KEY;
 
 /**
  * 파일을 0G Storage에 업로드
+ * 
+ * TODO: 실제 0G Storage API 구현 필요
+ * 1. API 문서 확인 (https://developer.0g.dev/docs/storage-api)
+ * 2. 인증 헤더 설정
+ * 3. 파일 업로드 프로토콜 확인
+ * 4. 에러 처리 및 재시도 로직 구현
+ * 
+ * 현재는 더미 응답을 반환합니다.
+ * 실제 구현 시 아래 주석 처리된 코드를 사용하세요.
  */
 export async function uploadToZeroGStorage(
   filePath: string,
@@ -28,11 +41,25 @@ export async function uploadToZeroGStorage(
     // 파일 해시 생성
     const fileHash = createHash('sha256').update(fileData).digest('hex');
     
-    // 폼 데이터 생성
+    // TODO: 실제 0G Storage API 요청 구현
+    console.log('⚠️ TODO: 실제 0G Storage API 구현 필요');
+    console.log('File:', fileName);
+    console.log('Hash:', fileHash);
+    console.log('Options:', options);
+    
+    return {
+      success: true,
+      cid: 'dummy-cid-' + Date.now(),
+      size: fileData.length,
+      timestamp: new Date().toISOString(),
+      uri: `0g://dummy-cid-${Date.now()}`
+    };
+    
+    // 실제 구현 시 아래 코드 사용
+    /*
     const formData = new FormData();
     formData.append('file', new Blob([fileData]), fileName);
     
-    // 메타데이터 추가
     const metadata = {
       name: options.name || fileName,
       description: options.description || 'Uploaded by MCS',
@@ -46,7 +73,6 @@ export async function uploadToZeroGStorage(
     
     formData.append('metadata', JSON.stringify(metadata));
     
-    // 0G Storage API 호출
     const response = await axios.post(`${ZERO_G_STORAGE_API}/upload`, formData, {
       headers: {
         'Authorization': `Bearer ${ZERO_G_STORAGE_KEY}`,
@@ -61,6 +87,7 @@ export async function uploadToZeroGStorage(
       timestamp: response.data.timestamp,
       uri: `0g://${response.data.cid}`
     };
+    */
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error(`Error uploading to 0G Storage: ${filePath}`, error);
@@ -74,6 +101,11 @@ export async function uploadToZeroGStorage(
 
 /**
  * JSON 메타데이터를 0G Storage에 업로드
+ * 
+ * TODO: 실제 구현 필요
+ * 1. 임시 파일 관리 최적화
+ * 2. 업로드 실패 시 정리 로직
+ * 3. 메타데이터 검증
  */
 export async function uploadJsonToZeroGStorage(
   jsonData: Record<string, unknown>,
@@ -116,6 +148,11 @@ export async function uploadJsonToZeroGStorage(
 
 /**
  * 보안 점수 계산
+ * 
+ * TODO: 실제 구현 필요
+ * 1. 취약점 심각도 가중치 조정
+ * 2. 추가 보안 메트릭 통합
+ * 3. 점수 계산 알고리즘 최적화
  */
 export function calculateSecurityScore(analysisResult: AnalysisResult): number {
   if (!analysisResult || !analysisResult.analysis) {
@@ -124,6 +161,7 @@ export function calculateSecurityScore(analysisResult: AnalysisResult): number {
   
   const severityCounts = analysisResult.analysis.severity_counts || {};
   
+  // TODO: 가중치 조정 필요
   const highWeight = 5;
   const mediumWeight = 3;
   const lowWeight = 1;

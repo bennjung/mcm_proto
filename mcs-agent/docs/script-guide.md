@@ -2,103 +2,76 @@
 
 ## 개요
 
-MCS는 다음과 같은 자동화 스크립트를 제공합니다:
+이 문서는 MCS Agent의 스크립트 사용 방법을 설명합니다.
 
-1. `analyze-repo.js`: 저장소 분석
-2. `generate-tee-attestation.js`: TEE 증명 생성
-3. `encrypt-code.js`: 코드 암호화
-4. `upload-to-ipfs.js`: IPFS 업로드
-5. `mint-on-0g-chain.js`: 0G Chain NFT 민팅
-6. `mint-thirdweb.js`: ThirdWeb NFT 민팅
+## 스크립트 목록
 
-## 스크립트 사용법
+1. `analyze-code.js`: 코드 분석
+2. `encrypt-code.js`: 코드 암호화
+3. `upload-to-storage.js`: 0G Storage 업로드
+4. `mint-nft.js`: NFT 민팅
 
-### 저장소 분석
+## 사용 방법
+
+### 코드 분석
+
 ```bash
-node scripts/analyze-repo.js --path <repo_path> --extensions ".sol,.js,.ts"
+node scripts/analyze-code.js \
+  --repo https://github.com/your-username/your-repo.git \
+  --output ./analysis-results.json
 ```
-
-**옵션**
-- `--path`: 분석할 저장소 경로
-- `--extensions`: 분석할 파일 확장자 (콤마로 구분)
-
-### TEE 증명 생성
-```bash
-node scripts/generate-tee-attestation.js --analysis <analysis_result>
-```
-
-**옵션**
-- `--analysis`: 분석 결과 JSON
 
 ### 코드 암호화
+
 ```bash
-node scripts/encrypt-code.js --path <file_path> --analysis <analysis_result>
+node scripts/encrypt-code.js \
+  --input ./analysis-results.json \
+  --output ./encrypted-code.json
 ```
 
-**옵션**
-- `--path`: 암호화할 파일 경로
-- `--analysis`: 분석 결과 JSON
+### 0G Storage 업로드
 
-### IPFS 업로드
 ```bash
-node scripts/upload-to-ipfs.js \
-  --encrypted <encryption_result> \
-  --analysis <analysis_result> \
-  --attestation <attestation>
+node scripts/upload-to-storage.js \
+  --encrypted ./encrypted-code.json \
+  --analysis ./analysis-results.json \
+  --metadata ./metadata.json
 ```
 
-**옵션**
-- `--encrypted`: 암호화 결과 JSON
-- `--analysis`: 분석 결과 JSON
-- `--attestation`: TEE 증명 토큰
+### NFT 민팅
 
-### 0G Chain NFT 민팅
 ```bash
-node scripts/mint-on-0g-chain.js \
-  --address <wallet_address> \
-  --metadata <metadata_uri> \
-  --attestation <attestation> \
-  --network <network>
+node scripts/mint-nft.js \
+  --storage ./storage-result.json \
+  --wallet 0x...
 ```
 
-**옵션**
-- `--address`: 지갑 주소
-- `--metadata`: 메타데이터 URI
-- `--attestation`: TEE 증명 토큰
-- `--network`: 네트워크 (0g-testnet/0g-mainnet)
+## 환경 변수
 
-### ThirdWeb NFT 민팅
-```bash
-node scripts/mint-thirdweb.js \
-  --address <wallet_address> \
-  --metadata <metadata_uri> \
-  --network <network>
-```
+다음 환경 변수를 설정해야 합니다:
 
-**옵션**
-- `--address`: 지갑 주소
-- `--metadata`: 메타데이터 URI
-- `--network`: 네트워크 (sepolia)
-
-## GitHub Actions 통합
-
-MCS 스크립트는 GitHub Actions 워크플로우와 통합되어 있습니다. `.github/workflows/mcs-workflow.yml` 파일에서 워크플로우 설정을 확인할 수 있습니다.
-
-### 워크플로우 트리거
-
-1. `main` 브랜치로 푸시
-2. PR 생성
-3. 수동 트리거 (지갑 주소와 네트워크 선택 필요)
-
-### 환경 변수 설정
-
-워크플로우 실행을 위해 다음 GitHub Secrets를 설정해야 합니다:
-
-- `PINATA_API_KEY`
-- `PINATA_SECRET_KEY`
-- `ZERO_G_PRIVATE_KEY`
-- `ZERO_G_RPC_URL`
+- `NETWORK_RPC_URL`
+- `PRIVATE_KEY`
 - `NFT_CONTRACT_ADDRESS`
-- `DEFAULT_WALLET_ADDRESS`
-- `TEE_API_KEY`
-- `TEE_SERVICE_URL` 
+- `WALLET_ADDRESS`
+- `ZERO_G_STORAGE_API`
+- `ZERO_G_STORAGE_KEY`
+
+## 문제 해결
+
+### 일반적인 문제
+
+1. **스크립트 실행 실패**
+   - 환경 변수 확인
+   - 의존성 설치 확인
+   - 네트워크 연결 확인
+
+2. **업로드 실패**
+   - API 키 확인
+   - 파일 크기 확인
+   - 네트워크 연결 확인
+
+3. **민팅 실패**
+   - 지갑 잔액 확인
+   - 가스비 설정 확인
+   - 컨트랙트 주소 확인 
