@@ -37,16 +37,17 @@
 ### 1.2 실제 데이터 구조
 ```typescript
 interface Vulnerability {
-  type: 'external_communication' | 'wallet_draining' | 'unauthorized_abi_call';
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  line: number;
+  type: string;
+  severity: 'high' | 'medium' | 'low';
   description: string;
+  line: number;
+  code: string;
 }
 
 interface AnalysisResult {
   vulnerabilities: Vulnerability[];
   suggestions: string[];
-  score: number;
+  securityScore: number;
 }
 ```
 
@@ -72,20 +73,90 @@ interface NFTMetadata {
   description: string;
   image: string;
   attributes: {
-    trait_type: string;
-    value: string | number;
-  }[];
+    securityScore: number;
+    analysisDate: string;
+    storageUri: string;
+    teeAttestation: string;
+  };
 }
 ```
 
-## 3. 실제 구현 시 필요한 데이터
+## 3. 평판 분석 결과
 
-### 3.1 코드 분석
+### 3.1 임시 데이터 예시
+```json
+{
+  "repository": {
+    "name": "보안 코드 저장소",
+    "full_name": "보안 코드 저장소",
+    "description": "보안 코드와 관련된 저장소"
+  },
+  "metrics": {
+    "stars": 100,
+    "forks": 50,
+    "watchers": 200,
+    "open_issues": 10,
+    "contributors": 50,
+    "created_at": "2023-01-01",
+    "updated_at": "2023-01-01"
+  },
+  "trust_score": {
+    "score": 85,
+    "grade": "A",
+    "details": {
+      "baseScore": 85,
+      "starScore": 10,
+      "forkScore": 10,
+      "contributorScore": 10,
+      "issuePenalty": 0
+    }
+  }
+}
+```
+
+### 3.2 실제 데이터 구조
+```typescript
+interface RepositoryMetrics {
+  stars: number;
+  forks: number;
+  watchers: number;
+  open_issues: number;
+  contributors: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TrustScore {
+  score: number;
+  grade: string;
+  details: {
+    baseScore: number;
+    starScore: number;
+    forkScore: number;
+    contributorScore: number;
+    issuePenalty: number;
+  };
+}
+
+interface ReputationResult {
+  repository: {
+    name: string;
+    full_name: string;
+    description: string;
+  };
+  metrics: RepositoryMetrics;
+  trust_score: TrustScore;
+}
+```
+
+## 4. 실제 구현 시 필요한 데이터
+
+### 4.1 코드 분석
 ```typescript
 // 분석 요청 데이터
 interface AnalysisRequest {
   code: string;          // 분석할 코드
-  file_type: string;     // 파일 확장자 (.sol, .js, .ts)
+  fileType: string;      // 파일 확장자 (.sol, .js, .ts)
 }
 
 // 분석 결과 데이터
@@ -101,13 +172,12 @@ interface AnalysisResponse {
 }
 ```
 
-### 3.2 NFT 민팅
+### 4.2 NFT 민팅
 ```typescript
 // 민팅 요청 데이터
 interface MintRequest {
-  wallet_address: string;    // 수신자 지갑 주소
-  metadata_uri: string;      // 메타데이터 URI
-  chain_type: string;        // 체인 유형 (0g-testnet, 0g-mainnet)
+  storageUri: string;
+  metadata: NFTMetadata;
 }
 
 // 민팅 결과 데이터
@@ -119,30 +189,19 @@ interface MintResponse {
 }
 ```
 
-## 4. 실제 데이터 예시
-
-### 4.1 코드 분석 요청
-```json
-{
-  "code": "contract Vulnerable {\n  function transfer(address to, uint amount) public {\n    require(to != address(0));\n    to.transfer(amount);\n  }\n}",
-  "file_type": ".sol"
-}
-```
-
-### 4.2 NFT 민팅 요청
-```json
-{
-  "wallet_address": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-  "metadata_uri": "ipfs://QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco",
-  "chain_type": "0g-testnet"
+### 4.3 평판 분석 요청
+```typescript
+interface ReputationRequest {
+  repoUrl: string;
 }
 ```
 
 ## 5. 데이터 유효성 검사
 
 ### 5.1 필수 필드
-- 코드 분석: `code`, `file_type`
-- NFT 민팅: `wallet_address`, `metadata_uri`, `chain_type`
+- 코드 분석: `code`, `fileType`
+- NFT 민팅: `storageUri`, `metadata`
+- 평판 분석: `repoUrl`
 
 ### 5.2 데이터 형식
 - 지갑 주소: 0x로 시작하는 42자리 16진수
@@ -172,5 +231,14 @@ interface MintResponse {
     "code": "ECONNREFUSED",
     "url": "http://localhost:8000/analyze"
   }
+}
+```
+
+### 6.3 평판 분석 오류
+```json
+{
+  "error": "Repository analysis failed",
+  "code": "REPO_ANALYSIS_ERROR",
+  "details": "Invalid repository URL"
 }
 ``` 
