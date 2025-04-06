@@ -1,25 +1,23 @@
-import { Contract, ContractTransactionResponse } from 'ethers';
+import { BaseContract, Contract, ContractTransactionResponse } from 'ethers';
 
 export interface NFTMetadata {
   name: string;
   description: string;
   image: string;
   attributes: {
-    securityScore: number;
-    analysisDate: string;
-    storageUri: string;
-    teeAttestation: string;
-    [key: string]: any;
-  };
+    trait_type: string;
+    value: string | number;
+  }[];
 }
 
-export interface NFTContract extends Contract {
+export interface NFTContractInterface extends BaseContract {
   safeMint(to: string, uri: string): Promise<ContractTransactionResponse>;
   ownerOf(tokenId: number): Promise<string>;
   tokenURI(tokenId: number): Promise<string>;
   balanceOf(owner: string): Promise<bigint>;
-  totalSupply(): Promise<bigint>;
 }
+
+export type NFTContract = Contract & NFTContractInterface;
 
 export const NFTContract = {
   abi: [

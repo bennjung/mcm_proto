@@ -82,7 +82,7 @@ export async function mintNFTOnZeroGChain(
       throw new Error('0G Chain configuration is missing');
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const provider = ethers.getDefaultProvider(rpcUrl);
     const wallet = new ethers.Wallet(privateKey, provider);
 
     // ABI 및 컨트랙트 인스턴스 생성
@@ -95,8 +95,8 @@ export async function mintNFTOnZeroGChain(
     const tx = await contract.mint(
       walletAddress,
       metadataUri,
-      ethers.utils.keccak256(ethers.utils.toUtf8Bytes(securityData.codeHash)),
-      ethers.utils.keccak256(ethers.utils.toUtf8Bytes(securityData.analysisHash)),
+      ethers.keccak256(ethers.toUtf8Bytes(securityData.codeHash)),
+      ethers.keccak256(ethers.toUtf8Bytes(securityData.analysisHash)),
       securityData.timestamp,
       securityData.verifier,
       securityData.teeAttestation
@@ -135,7 +135,7 @@ export async function verifyCodeSecurityStatus(tokenId: string) {
       throw new Error('0G Chain configuration is missing');
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+    const provider = ethers.getDefaultProvider(rpcUrl);
 
     // ABI 및 컨트랙트 인스턴스 생성
     const abi = [

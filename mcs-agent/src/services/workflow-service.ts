@@ -64,25 +64,21 @@ export const runZeroGMCSWorkflow = async (
     workflowStatus.steps.storage.status = 'processing';
     const storageResult = await uploadToZeroGStorage(
       encryptionResult.encryptedCode,
-      analysis,
       {
         sourceRepo: repoUrl,
         analysisTimestamp: new Date().toISOString()
       }
     );
     
-    if (!storageResult.success) {
-      throw new Error(`0G Storage upload failed: ${storageResult.error}`);
+    if (!storageResult.success || !storageResult.metadataUri) {
+      throw new Error(`0G Storage upload failed: ${storageResult.error || 'No metadata URI returned'}`);
     }
     
     workflowStatus.steps.storage.status = 'completed';
-    workflowStatus.steps.storage.result = {
-      storageId: storageResult.storageId,
-      metadataUri: storageResult.metadataUri
-    };
+    workflowStatus.steps.storage.result = storageResult;
     
     // 4. NFT 민팅
-    console.log(`Step 4: Minting NFT with metadata URI ${storageResult.metadataUri}`);
+    console.log('Step 4: Minting NFT');
     workflowStatus.steps.minting.status = 'processing';
     const mintResult = await mintNFT(
       storageResult.metadataUri,

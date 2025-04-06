@@ -117,15 +117,27 @@ export async function mintNFT(
   try {
     const nftService = new NFTService();
     const txHash = await nftService.mintNFT({
-      name: `MCS Analysis - ${options.sourceRepo}`,
+      name: 'Code Security NFT',
       description: `Security analysis result for ${options.sourceRepo}`,
       image: 'https://example.com/placeholder.png',
-      attributes: {
-        securityScore: 100,
-        analysisDate: options.analysisTimestamp,
-        storageUri: metadataUri,
-        teeAttestation: 'verified'
-      }
+      attributes: [
+        {
+          trait_type: 'Security Score',
+          value: 100
+        },
+        {
+          trait_type: 'Analysis Date',
+          value: options.analysisTimestamp
+        },
+        {
+          trait_type: 'Storage URI',
+          value: metadataUri
+        },
+        {
+          trait_type: 'TEE Attestation',
+          value: 'verified'
+        }
+      ]
     });
 
     return {
