@@ -1,12 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack(config) {
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'pino-pretty': false
+      };
+    }
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     });
     return config;
   },
+  reactStrictMode: true,
+  swcMinify: true,
   // MCS Agent 관련 설정
   env: {
     NETWORK_RPC_URL: process.env.NETWORK_RPC_URL,

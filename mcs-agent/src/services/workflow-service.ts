@@ -14,25 +14,6 @@ interface WorkflowOptions {
   verifierAddress?: string;
 }
 
-interface WorkflowStatus {
-  repoUrl: string;
-  walletAddress: string;
-  steps: {
-    analysis: StepResult;
-    encryption: StepResult;
-    storage: StepResult;
-    minting: StepResult;
-  };
-  startTime: string;
-  endTime?: string;
-  status?: string;
-  result?: {
-    [key: string]: string | number | boolean | null | undefined;
-  };
-  error?: string;
-  timestamp?: string;
-}
-
 /**
  * 0G Chain 통합 MCS 워크플로우 실행
  * 

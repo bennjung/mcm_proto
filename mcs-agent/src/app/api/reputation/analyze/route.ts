@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { initializeAgent } from '@/lib/elizaos/core';
+import { initializeAgent, getModule } from '@/lib/elizaos/core';
 import { initializeReputationModule } from '@/lib/elizaos/reputation';
-import { getModule } from '@/lib/elizaos/core';
 
 // 초기화 플래그
 let isInitialized = false;
@@ -9,13 +8,23 @@ let isInitialized = false;
 /**
  * 저장소 평판 분석 API
  */
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   // POST 메서드만 허용
-  if (req.method !== 'POST') {
+  if (request.method !== 'POST') {
     return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
   }
 
   try {
+    const data = await request.json();
+    const { repoUrl } = data;
+
+    if (!repoUrl) {
+      return NextResponse.json(
+        { error: 'Repository URL is required' },
+        { status: 400 }
+      );
+    }
+
     // 첫 요청 시 ElizaOS Agent 초기화
     if (!isInitialized) {
       await initializeAgent();
@@ -23,12 +32,6 @@ export async function POST(req: Request) {
       isInitialized = true;
     }
 
-    const { repoUrl } = await req.json();
-    
-    if (!repoUrl) {
-      return NextResponse.json({ error: 'Repository URL is required' }, { status: 400 });
-    }
-    
     // 평판 모듈 가져오기
     const reputationModule = getModule('reputation');
     
@@ -36,11 +39,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Reputation module not initialized' }, { status: 500 });
     }
     
-    const result = await reputationModule.analyzeRepoMetrics(repoUrl);
+    const result = await reputationModule.analyzeReputation(repoUrl);
     
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in repository reputation analysis API:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || 'Internal server error' },
+      { status: 500 }
+    );
   }
 } 

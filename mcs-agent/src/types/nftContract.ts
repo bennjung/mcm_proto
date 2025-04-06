@@ -1,16 +1,37 @@
-import { ethers } from 'ethers';
+import { Contract, ContractTransactionResponse } from 'ethers';
 
 export interface NFTMetadata {
   name: string;
   description: string;
   image: string;
-  properties?: Record<string, unknown>;
+  attributes: {
+    securityScore: number;
+    analysisDate: string;
+    storageUri: string;
+    teeAttestation: string;
+    [key: string]: any;
+  };
 }
 
-export interface NFTContract extends ethers.Contract {
-  mint: (to: string, metadataUri: string) => Promise<ethers.ContractTransaction>;
-  tokenURI: (tokenId: number) => Promise<string>;
-  ownerOf: (tokenId: number) => Promise<string>;
-  balanceOf: (owner: string) => Promise<ethers.BigNumber>;
-  totalSupply: () => Promise<ethers.BigNumber>;
-} 
+export interface NFTContract extends Contract {
+  safeMint(to: string, uri: string): Promise<ContractTransactionResponse>;
+  ownerOf(tokenId: number): Promise<string>;
+  tokenURI(tokenId: number): Promise<string>;
+  balanceOf(owner: string): Promise<bigint>;
+  totalSupply(): Promise<bigint>;
+}
+
+export const NFTContract = {
+  abi: [
+    {
+      inputs: [
+        { internalType: 'address', name: 'to', type: 'address' },
+        { internalType: 'string', name: 'uri', type: 'string' }
+      ],
+      name: 'safeMint',
+      outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    }
+  ]
+}; 
