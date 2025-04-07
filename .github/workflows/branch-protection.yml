@@ -1,0 +1,40 @@
+name: Branch Protection Rules
+
+on:
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  enforce-branch-protection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce branch protection
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: rules } = await github.rest.repos.getBranchProtection({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: context.ref.replace('refs/heads/', '')
+            });
+            
+            if (!rules.required_pull_request_reviews) {
+              await github.rest.repos.updateBranchProtection({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: context.ref.replace('refs/heads/', ''),
+                required_status_checks: {
+                  strict: true,
+                  contexts: ['test', 'lint']
+                },
+                enforce_admins: true,
+                required_pull_request_reviews: {
+                  required_approving_review_count: 1,
+                  dismiss_stale_reviews: true,
+                  require_code_owner_reviews: true
+                },
+                restrictions: null,
+                allow_force_pushes: false,
+                allow_deletions: false
+              });
+            } 
