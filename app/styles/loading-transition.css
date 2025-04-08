@@ -1,0 +1,64 @@
+.loading-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.loading-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-icon img {
+  filter: brightness(0) invert(1);
+}
+
+.loading-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loading-text h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.loading-text p {
+  color: #A0AEC0;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotating {
+  animation: rotate 2s linear infinite;
+} 

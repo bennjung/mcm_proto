@@ -1,0 +1,672 @@
+/* 전체 페이지 컨테이너 */
+.pageContainer {
+  min-height: 100vh;
+  background-color: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 페이지 헤더 */
+.pageHeader {
+  padding: 1.5rem 2rem;
+  background-color: transparent;
+}
+
+.titleWrapper {
+  position: relative;
+  padding-bottom: 0.1px;
+}
+
+.titleUnderline {
+  position: absolute;
+  bottom: -10px;
+  left: -5px;
+  width: 110%;
+  height: auto;
+  transform: scale(1.1);
+}
+
+.titleUnderline img {
+  width: 100%;
+  height: auto;
+}
+
+.pageTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pageTitle h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.pageLogo {
+  color: #3b82f6;
+}
+
+/* 페이지 컨텐츠 */
+.pageContent {
+  display: flex;
+  flex: 1;
+  padding: 0 1rem;
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 200px;
+  padding-right: 1.5rem;
+}
+
+.sideNav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.navItem:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.navItem.active {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.navIcon {
+  font-size: 1.1rem;
+}
+
+/* 메인 컨텐츠 */
+.mainContent {
+  flex: 1;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+.contentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.tab:hover, .tab.activeTab {
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.moreButton {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.moreButton:hover {
+  background-color: #f9fafb;
+}
+
+/* 모듈 섹션 */
+.modulesSection {
+  padding: 0.5rem 0;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 1.25rem;
+}
+
+.moduleGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 220px));
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+@media (max-width: 1200px) {
+  .moduleGrid {
+    grid-template-columns: repeat(3, minmax(0, 220px));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .moduleGrid {
+    grid-template-columns: repeat(2, minmax(0, 220px));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .moduleGrid {
+    grid-template-columns: repeat(1, minmax(0, 220px));
+    gap: 1.25rem;
+  }
+}
+
+.moduleCard {
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.moduleCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.25);
+  z-index: 0;
+}
+
+.moduleName, .moduleDate, .moduleTags {
+  position: relative;
+  z-index: 1;
+}
+
+.moduleCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.moduleCard:hover .moduleName {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.moduleCard:hover .moduleDate {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.moduleName {
+  font-size: 1.25rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 0.5rem 0 1rem 0;
+  color: #1e293b;
+}
+
+.moduleDate {
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  margin: 2rem auto;
+  width: 90%;
+  position: relative;
+  z-index: 1;
+}
+
+.verificationLabel {
+  font-size: 0.7rem;
+  color: rgba(75, 85, 99, 0.8);
+  margin-bottom: 0.125rem;
+  text-align: center;
+}
+
+.verificationDate {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #1e293b;
+  text-align: center;
+}
+
+.moduleTags {
+  display: flex;
+  gap: 0.25rem;
+  position: absolute;
+  bottom: 1.25rem;
+}
+
+.moduleTag {
+  font-size: 0.7rem;
+  padding: 0.125rem 0.5rem;
+  background-color: white;
+  border-radius: 2rem;
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* 컨텐츠 섹션 */
+.contentSection {
+  padding: 0.5rem 0;
+}
+
+/* 프로필 섹션 */
+.profileSection {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.profileHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.profileAvatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.profileName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.profileEmail {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.profileStats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.profileInfo {
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.infoItem:last-child {
+  margin-bottom: 0;
+}
+
+.infoLabel {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.infoValue {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+/* 소셜 연결 섹션 */
+.socialSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.connectedAccount, .connectAccount {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.accountIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.accountEmoji {
+  font-size: 1.5rem;
+}
+
+.accountInfo {
+  flex: 1;
+}
+
+.accountName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.accountHandle, .accountPrompt {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.disconnectButton, .connectButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.disconnectButton {
+  background-color: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+}
+
+.disconnectButton:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.connectButton {
+  background-color: #3b82f6;
+  border: none;
+  color: white;
+}
+
+.connectButton:hover {
+  background-color: #2563eb;
+}
+
+/* 지갑 섹션 */
+.walletSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.connectedWallet {
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.walletHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.walletTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.walletStatus {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 2rem;
+}
+
+.walletAddress {
+  display: flex;
+  align-items: center;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.addressLabel {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-right: 0.75rem;
+}
+
+.addressValue {
+  font-size: 0.85rem;
+  color: #1e293b;
+  font-family: monospace;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copyButton {
+  background-color: transparent;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.copyButton:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.walletBalance {
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.balanceItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.balanceItem:last-child {
+  border-bottom: none;
+}
+
+.tokenName {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.tokenValue {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.walletActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.walletButton {
+  background-color: transparent;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  transition: all 0.2s;
+}
+
+.walletButton:hover {
+  background-color: #f9fafb;
+}
+
+.walletSettings {
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.walletSettingsTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1.25rem 0;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.settingItem:last-child {
+  margin-bottom: 0;
+}
+
+.settingLabel {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e5e7eb;
+  border-radius: 24px;
+  transition: .4s;
+}
+
+.toggleSlider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .4s;
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+  background-color: #3b82f6;
+}
+
+.toggleSwitch input:checked + .toggleSlider:before {
+  transform: translateX(20px);
+}
+
+.tabIcon {
+  font-size: 1.1rem;
+  margin-right: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+} 
