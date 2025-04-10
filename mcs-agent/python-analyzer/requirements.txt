@@ -1,0 +1,28 @@
+# FastAPI 관련
+fastapi==0.109.2
+uvicorn==0.27.1
+pydantic==2.6.1
+python-multipart==0.0.7
+
+# 코드 분석
+pylint==3.0.3
+bandit==1.7.7
+mypy==1.8.0
+black==24.1.1
+
+# AI 및 NLP
+transformers==4.37.2
+torch==2.2.0
+numpy==1.26.3
+pandas==2.2.0
+
+# 유틸리티
+python-dotenv==1.0.1
+requests==2.31.0
+aiohttp==3.9.3
+cryptography==42.0.2
+
+# 테스트
+pytest==8.0.0
+pytest-asyncio==0.23.5
+pytest-cov==4.1.0 
